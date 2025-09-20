@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FUD Clinic Doctor Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Custom styles for patient list items */
+    .patient-item {
+      cursor: pointer;
+      padding: 1rem;
+      border-bottom: 1px solid #e2e8f0; /* gray-200 */
+      transition: background-color 0.2s ease-in-out;
+    }
+    .patient-item:hover {
+      background-color: #edf2f7; /* gray-100 */
+    }
+    .patient-item.selected {
+      background-color: #bfdbfe; /* blue-200 */
+      font-weight: bold;
+    }
+    .patient-item:last-child {
+      border-bottom: none;
+    }
+  </style>
+</head>
+<body class="bg-[#f4f8fb] font-sans">
+
+  <header class="bg-[#2a4365] text-white px-6 py-6 shadow flex flex-col items-center justify-center space-y-2">
+    <img src="https://placehold.co/64x64/2a4365/ffffff?text=FUD"
+         alt="FUD Logo"
+         class="h-16 w-16 rounded-full border border-white"
+         onerror="this.onerror=null;this.src='https://placehold.co/64x64/2a4365/ffffff?text=FUD';" />
+
+    <div class="text-center">
+      <h1 class="text-2xl font-bold">FEDERAL UNIVERSITY DUTSE</h1>
+      <p class="text-lg">CONSULTATION UNIT</p>
+    </div>
+  </header>
+
+  <nav class="bg-gray-200 p-3 flex justify-center">
+    <button id="nav-home" class="bg-[#2b6cb0] text-white px-6 py-2 rounded-lg shadow hover:bg-[#2a4365] transition duration-300">
+      Home
+    </button>
+  </nav>
+
+  <section id="section-doctor-dashboard" class="max-w-4xl mx-auto mt-10 bg-white p-8 rounded-xl shadow-lg">
+    <h2 class="text-2xl font-semibold mb-6 text-gray-700">Patients for Today's Consultation</h2>
+
+    <div id="patient-list-container" class="border border-gray-300 rounded-md overflow-hidden mb-6">
+      <div id="patient-list" class="divide-y divide-gray-200 max-h-96 overflow-y-auto">
+        <p class="p-4 text-gray-500 text-center">No patients for today or please refresh the page.</p>
+      </div>
+    </div>
+
+    <div class="text-center">
+      <p class="text-gray-600">Select a patient from the list above to begin consultation.</p>
+    </div>
+  </section>
+
+  <section id="section-doctor-consultation-form" class="max-w-3xl mx-auto mt-10 bg-white p-8 rounded-xl shadow-lg hidden">
+    <h2 class="text-2xl font-semibold mb-6 text-gray-700">Consultation for: <span id="consultation-patient-name" class="text-blue-700"></span></h2>
+
+    <div class="bg-blue-50 p-4 rounded-md mb-6 border border-blue-200">
+      <h3 class="text-lg font-semibold text-blue-800 mb-2">Patient Details</h3>
+      <p><strong>Full Name:</strong> <span id="display-full-name"></span></p>
+      <p><strong>Date of Birth:</strong> <span id="display-dob"></span></p>
+      <p><strong>File Number:</strong> <span id="display-file-number"></span></p>
+      <p><strong>Visit Status:</strong> <span id="display-visit-status"></span></p>
+      <p id="display-reg-no"><strong>Reg. No:</strong> <span></span></p>
+      <p id="display-department"><strong>Department:</strong> <span></span></p>
+      <p id="display-contact-address"><strong>Contact Address:</strong> <span></span></p>
+      <p id="display-phone-number"><strong>Phone Number:</strong> <span></span></p>
+      <p id="display-nok-name"><strong>Next of Kin:</strong> <span></span></p>
+      <p id="display-nok-phone"><strong>Next of Kin Phone:</strong> <span></span></p>
+      <p id="display-nok-address"><strong>Next of Kin Address:</strong> <span></span></p>
+      <p id="display-tribe"><strong>Tribe:</strong> <span></span></p>
+      <p id="display-religion"><strong>Religion:</strong> <span></span></p>
+      <p id="display-marital-status"><strong>Marital Status:</strong> <span></span></p>
+      <p id="display-gender"><strong>Gender:</strong> <span></span></p>
+    </div>
+
+    <form id="form-doctor-consultation" class="space-y-6">
+      <div>
+        <label for="doc-diagnosis" class="block mb-2 text-gray-600 font-medium">Diagnosis</label>
+        <textarea id="doc-diagnosis" required rows="8" class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" placeholder="Write diagnosis here..."></textarea>
+      </div>
+
+      <div>
+        <label for="doc-action" class="block mb-2 text-gray-600 font-medium">Action</label>
+        <select id="doc-action" class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <option value="none">-- Select Action --</option>
+          <option value="pharmacy">Send to Pharmacy</option>
+          <option value="request_lab_test">Request Laboratory Test</option>
+          <option value="discharge">Discharge Patient</option>
+          <option value="admission">Admit Patient</option>
+        </select>
+      </div>
+
+      <div class="flex justify-between items-center">
+        <button type="button" id="btn-back-to-list" class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition duration-300">
+          Back to Patient List
+        </button>
+        <button type="submit" class="bg-[#2b6cb0] text-white px-6 py-2 rounded-lg hover:bg-[#2a4365] transition duration-300">
+          Submit Consultation
+        </button>
+      </div>
+    </form>
+
+    <div id="consultation-success" class="text-green-600 mt-4 font-medium"></div>
+  </section>
+
+  <section id="section-lab-request" class="max-w-xl mx-auto mt-10 bg-white p-8 rounded-xl shadow-lg hidden">
+    <h2 class="text-2xl font-semibold mb-6 text-gray-700">Laboratory Test Request for: <span id="lab-patient-name" class="text-blue-700"></span></h2>
+
+    <form id="form-lab-request" class="space-y-6">
+      <div class="space-y-3">
+        <label class="block text-gray-600 font-medium">Select Test Type:</label>
+        <div>
+          <input type="radio" id="lab-microbiology" name="lab_test_type" value="MICROBIOLOGY REQUEST" class="mr-2" required>
+          <label for="lab-microbiology" class="text-gray-700">MICROBIOLOGY REQUEST</label>
+        </div>
+        <div>
+          <input type="radio" id="lab-chemical-pathology" name="lab_test_type" value="CHEMICAL PATHOLOGY REQUEST" class="mr-2">
+          <label for="lab-chemical-pathology" class="text-gray-700">CHEMICAL PATHOLOGY REQUEST</label>
+        </div>
+        <div>
+          <input type="radio" id="lab-haematology" name="lab_test_type" value="HAEMATOLOGY REQUEST" class="mr-2">
+          <label for="lab-haematology" class="text-gray-700">HAEMATOLOGY REQUEST</label>
+        </div>
+      </div>
+
+      <div class="flex justify-between items-center">
+        <button type="button" id="btn-back-to-consultation" class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition duration-300">
+          Back to Consultation
+        </button>
+        <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition duration-300">
+          Send Lab Request
+        </button>
+      </div>
+    </form>
+    <div id="lab-request-success" class="text-green-600 mt-4 font-medium"></div>
+  </section>
+
+
+  <script>
+    // --- Section References ---
+    const sectionDoctorDashboard = document.getElementById("section-doctor-dashboard");
+    const sectionDoctorConsultationForm = document.getElementById("section-doctor-consultation-form");
+    const sectionLabRequest = document.getElementById("section-lab-request"); // New lab section
+
+    // --- Elements on Dashboard ---
+    const navHomeBtn = document.getElementById("nav-home");
+    const patientListDiv = document.getElementById("patient-list");
+
+    // --- Elements on Consultation Form ---
+    const consultationPatientNameSpan = document.getElementById("consultation-patient-name");
+    const displayFullName = document.getElementById("display-full-name");
+    const displayDob = document.getElementById("display-dob");
+    const displayFileNumber = document.getElementById("display-file-number");
+    const displayVisitStatus = document.getElementById("display-visit-status");
+    const displayRegNo = document.getElementById("display-reg-no").querySelector('span');
+    const displayDepartment = document.getElementById("display-department").querySelector('span');
+    const displayContactAddress = document.getElementById("display-contact-address").querySelector('span');
+    const displayPhoneNumber = document.getElementById("display-phone-number").querySelector('span');
+    const displayNokName = document.getElementById("display-nok-name").querySelector('span');
+    const displayNokPhone = document.getElementById("display-nok-phone").querySelector('span');
+    const displayNokAddress = document.getElementById("display-nok-address").querySelector('span');
+    const displayTribe = document.getElementById("display-tribe").querySelector('span');
+    const displayReligion = document.getElementById("display-religion").querySelector('span');
+    const displayMaritalStatus = document.getElementById("display-marital-status").querySelector('span');
+    const displayGender = document.getElementById("display-gender").querySelector('span');
+
+    const formDoctorConsultation = document.getElementById("form-doctor-consultation");
+    const docDiagnosisInput = document.getElementById("doc-diagnosis");
+    const docActionSelect = document.getElementById("doc-action");
+    const consultationSuccessMsg = document.getElementById("consultation-success");
+    const btnBackToList = document.getElementById("btn-back-to-list");
+
+    // --- Elements on Lab Request Form ---
+    const labPatientNameSpan = document.getElementById("lab-patient-name");
+    const formLabRequest = document.getElementById("form-lab-request");
+    const labRequestSuccessMsg = document.getElementById("lab-request-success");
+    const btnBackToConsultation = document.getElementById("btn-back-to-consultation");
+
+    // --- In-memory Patient Data (Simulated Queue for Doctor) ---
+    const patientsAwaitingConsultation = [
+      {
+        id: 'P001',
+        type: 'simple_add',
+        fullName: 'Aliyu Musa',
+        dob: '1990-05-15',
+        fileNumber: 'FUD/2025/001',
+        visitStatus: 'New',
+        consultations: [],
+        labRequests: [] 
+      },
+      {
+        id: 'P002',
+        type: 'full_register',
+        reg_no: 'REG/2025/002',
+        first_name: 'Fatima',
+        sur_name: 'Bello',
+        dob: '1988-11-22',
+        department: 'Computer Science',
+        contact_address: 'No 45, University Quarters',
+        phone_number: '08012345678',
+        nok_name: 'Ahmed Bello',
+        nok_phone: '09087654321',
+        nok_address: 'Same as patient',
+        tribe: 'Hausa',
+        religion: 'Islam',
+        marital_status: 'Married',
+        gender: 'Female',
+        consultations: [],
+        labRequests: []
+      },
+      {
+        id: 'P003',
+        type: 'simple_add',
+        fullName: 'John Doe',
+        dob: '2001-01-01',
+        fileNumber: 'FUD/2025/003',
+        visitStatus: 'Revisit',
+        consultations: [],
+        labRequests: []
+      }
+    ];
+
+    let selectedPatientId = null; // To keep track of the currently selected patient
+
+    // --- Helper Functions ---
+    function hideAllSections() {
+      sectionDoctorDashboard.classList.add("hidden");
+      sectionDoctorConsultationForm.classList.add("hidden");
+      sectionLabRequest.classList.add("hidden"); // Hide new lab section
+    }
+
+    function showSection(sectionElement) {
+      hideAllSections();
+      sectionElement.classList.remove("hidden");
+    }
+
+    function setResultMessage(element, message, isSuccess) {
+      element.textContent = message;
+      element.classList.toggle("text-green-600", isSuccess);
+      element.classList.toggle("text-red-600", !isSuccess);
+    }
+
+    // --- Render Patient List ---
+    function renderPatientList() {
+      patientListDiv.innerHTML = ""; // Clear existing list
+
+      if (patientsAwaitingConsultation.length === 0) {
+        patientListDiv.innerHTML = "<p class='p-4 text-gray-500 text-center'>No patients awaiting consultation for today.</p>";
+        return;
+      }
+
+      patientsAwaitingConsultation.forEach(patient => {
+        const patientItem = document.createElement("div");
+        patientItem.classList.add("patient-item");
+        patientItem.dataset.patientId = patient.id; // Store ID for easy lookup
+
+        const patientName = patient.type === 'simple_add' ? patient.fullName : `${patient.first_name} ${patient.sur_name}`;
+        const identifier = patient.type === 'simple_add' ? `File No: ${patient.fileNumber}` : `Reg. No: ${patient.reg_no}`;
+        const visitStatus = patient.type === 'simple_add' ? patient.visitStatus : 'N/A'; // Or determine from consultation history
+
+        patientItem.innerHTML = `
+          <h3 class="text-lg font-semibold text-gray-800">${patientName}</h3>
+          <p class="text-sm text-gray-600">${identifier} - Status: ${visitStatus}</p>
+        `;
+        patientListDiv.appendChild(patientItem);
+      });
+    }
+
+    // --- Display Consultation Form for Selected Patient ---
+    function displayConsultationForm(patient) {
+      selectedPatientId = patient.id; // Set global selected patient ID
+
+      const patientName = patient.type === 'simple_add' ? patient.fullName : `${patient.first_name} ${patient.sur_name}`;
+      consultationPatientNameSpan.textContent = patientName;
+      labPatientNameSpan.textContent = patientName; // Also set for the lab request form
+
+      // Clear previous success message
+      setResultMessage(consultationSuccessMsg, "", true);
+
+      // Populate patient details
+      displayFullName.textContent = patientName;
+      displayDob.textContent = patient.dob;
+      displayFileNumber.textContent = patient.fileNumber || 'N/A';
+      displayVisitStatus.textContent = patient.visitStatus || 'N/A';
+
+      // Show/hide and populate detailed fields based on patient type
+      const detailedFields = [
+        { element: displayRegNo.parentElement, data: patient.reg_no, span: displayRegNo },
+        { element: displayDepartment.parentElement, data: patient.department, span: displayDepartment },
+        { element: displayContactAddress.parentElement, data: patient.contact_address, span: displayContactAddress },
+        { element: displayPhoneNumber.parentElement, data: patient.phone_number, span: displayPhoneNumber },
+        { element: displayNokName.parentElement, data: patient.nok_name, span: displayNokName },
+        { element: displayNokPhone.parentElement, data: patient.nok_phone, span: displayNokPhone },
+        { element: displayNokAddress.parentElement, data: patient.nok_address, span: displayNokAddress },
+        { element: displayTribe.parentElement, data: patient.tribe, span: displayTribe },
+        { element: displayReligion.parentElement, data: patient.religion, span: displayReligion },
+        { element: displayMaritalStatus.parentElement, data: patient.marital_status, span: displayMaritalStatus },
+        { element: displayGender.parentElement, data: patient.gender, span: displayGender }
+      ];
+
+      detailedFields.forEach(field => {
+        if (patient.type === 'full_register' && field.data) {
+          field.element.classList.remove('hidden');
+          field.span.textContent = field.data;
+        } else {
+          field.element.classList.add('hidden'); // Hide if not applicable or empty
+        }
+      });
+
+      // Reset form fields
+      formDoctorConsultation.reset();
+      docActionSelect.value = "none"; // Ensure "Select Action" is default
+      docDiagnosisInput.value = patient.consultations.length > 0 ? patient.consultations[patient.consultations.length - 1].diagnosis : ''; // Pre-fill with last diagnosis if available
+
+      showSection(sectionDoctorConsultationForm);
+    }
+
+    // --- Event Listeners ---
+
+    // Home button to show dashboard
+    navHomeBtn.addEventListener('click', () => {
+      showSection(sectionDoctorDashboard);
+      // Remove 'selected' class from all patient items when going back to list
+      document.querySelectorAll('.patient-item').forEach(item => item.classList.remove('selected'));
+    });
+
+    // Patient list item click handler (Event Delegation)
+    patientListDiv.addEventListener('click', (e) => {
+      const patientItem = e.target.closest('.patient-item');
+      if (patientItem) {
+        // Remove 'selected' class from previously selected item
+        document.querySelectorAll('.patient-item').forEach(item => item.classList.remove('selected'));
+        // Add 'selected' class to the clicked item
+        patientItem.classList.add('selected');
+
+        const patientId = patientItem.dataset.patientId;
+        const patient = patientsAwaitingConsultation.find(p => p.id === patientId);
+        if (patient) {
+          displayConsultationForm(patient);
+        }
+      }
+    });
+
+    // Submit Consultation Form
+    formDoctorConsultation.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const diagnosis = docDiagnosisInput.value.trim();
+      const action = docActionSelect.value;
+
+      if (!diagnosis || action === "none") {
+        setResultMessage(consultationSuccessMsg, "Please fill in diagnosis and select an action.", false);
+        return;
+      }
+
+      const patient = patientsAwaitingConsultation.find(p => p.id === selectedPatientId);
+
+      if (patient) {
+        // Store consultation details with the patient record
+        patient.consultations.push({
+          date: new Date().toLocaleDateString('en-GB'),
+          time: new Date().toLocaleTimeString('en-GB'),
+          diagnosis: diagnosis,
+          action: action
+        });
+        setResultMessage(consultationSuccessMsg, `Consultation for ${patient.fullName || patient.first_name + ' ' + patient.sur_name} submitted successfully!`, true);
+        console.log(`Updated Patient ${patient.id} with Consultation:`, patient);
+
+        // Conditional action based on selection
+        if (action === 'request_lab_test') {
+          showSection(sectionLabRequest); // Show lab request form
+          setResultMessage(labRequestSuccessMsg, "", true); // Clear previous messages
+          formLabRequest.reset(); // Reset radio buttons
+        } else {
+          // For other actions, just stay on the consultation form or go back to list
+          // For simulation, we'll just log and reset.
+          console.log(`Action for ${patient.fullName || patient.first_name + ' ' + patient.sur_name}: ${action}`);
+          // Optionally, you might want to automatically go back to dashboard here
+          // setTimeout(() => showSection(sectionDoctorDashboard), 1500);
+        }
+
+      } else {
+        setResultMessage(consultationSuccessMsg, "Error: No patient selected for consultation.", false);
+      }
+    });
+
+    // Back to Patient List button from Consultation Form
+    btnBackToList.addEventListener('click', () => {
+      showSection(sectionDoctorDashboard);
+      selectedPatientId = null; // Clear selected patient
+      // Remove 'selected' class from all patient items when going back to list
+      document.querySelectorAll('.patient-item').forEach(item => item.classList.remove('selected'));
+    });
+
+    // Submit Lab Request Form
+    formLabRequest.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const selectedTestType = document.querySelector('input[name="lab_test_type"]:checked');
+
+      if (!selectedTestType) {
+        setResultMessage(labRequestSuccessMsg, "Please select a laboratory test type.", false);
+        return;
+      }
+
+      const patient = patientsAwaitingConsultation.find(p => p.id === selectedPatientId);
+
+      if (patient) {
+        patient.labRequests.push({
+          date: new Date().toLocaleDateString('en-GB'),
+          time: new Date().toLocaleTimeString('en-GB'),
+          testType: selectedTestType.value
+        });
+        setResultMessage(labRequestSuccessMsg, `Lab request for ${patient.fullName || patient.first_name + ' ' + patient.sur_name} (${selectedTestType.value}) sent successfully!`, true);
+        console.log(`Updated Patient ${patient.id} with Lab Request:`, patient);
+
+        // Optionally go back to consultation form or dashboard after sending lab request
+        // For now, let's go back to the patient list
+        setTimeout(() => {
+          showSection(sectionDoctorDashboard);
+          selectedPatientId = null; // Clear selected patient
+          document.querySelectorAll('.patient-item').forEach(item => item.classList.remove('selected'));
+        }, 1500);
+
+      } else {
+        setResultMessage(labRequestSuccessMsg, "Error: No patient selected for lab request.", false);
+      }
+    });
+
+    // Back to Consultation button from Lab Request Form
+    btnBackToConsultation.addEventListener('click', () => {
+      showSection(sectionDoctorConsultationForm);
+      setResultMessage(labRequestSuccessMsg, "", true); // Clear lab request message
+    });
+
+
+    // --- Initial Load ---
+    document.addEventListener("DOMContentLoaded", () => {
+      renderPatientList(); // Display the list of patients
+      showSection(sectionDoctorDashboard); // Show the dashboard initially
+    });
+  </script>
+
+</body>
+</html>

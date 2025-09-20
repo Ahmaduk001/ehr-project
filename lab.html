@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FUD Clinic Lab Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Custom styles for patient list items */
+    .patient-item {
+      cursor: pointer;
+      padding: 1rem;
+      border-bottom: 1px solid #e2e8f0; /* gray-200 */
+      transition: background-color 0.2s ease-in-out;
+    }
+    .patient-item:hover {
+      background-color: #edf2f7; /* gray-100 */
+    }
+    .patient-item:last-child {
+      border-bottom: none;
+    }
+    .patient-item.selected {
+      background-color: #bfdbfe; /* blue-200 */
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body class="bg-[#f4f8fb] font-sans">
+
+  <header class="bg-[#2a4365] text-white px-6 py-6 shadow flex flex-col items-center justify-center space-y-2">
+    <img src="logo.jfif"
+          alt="FUD Logo"
+          class="h-16 w-16 rounded-full border border-white"
+          onerror="this.onerror=null;this.src='https://placehold.co/64x64/2a4365/ffffff?text=FUD';" />
+
+    <div class="text-center">
+      <h1 class="text-2xl font-bold">FEDERAL UNIVERSITY DUTSE</h1>
+      <p class="text-lg">LABORATORY UNIT</p>
+    </div>
+  </header>
+
+  <nav class="bg-gray-200 p-3 flex justify-center space-x-4">
+    <button id="nav-lab" class="bg-[#2b6cb0] text-white px-6 py-2 rounded-lg shadow hover:bg-[#2a4365] transition duration-300">
+      Lab Dashboard
+    </button>
+  </nav>
+  
+  <section id="section-lab-dashboard" class="max-w-4xl mx-auto mt-10 bg-white p-8 rounded-xl shadow-lg">
+    <h2 class="text-2xl font-semibold mb-6 text-gray-700">Patients Awaiting Lab Test</h2>
+    <div id="lab-patient-list-container" class="border border-gray-300 rounded-md overflow-hidden mb-6">
+      <div id="lab-patient-list" class="divide-y divide-gray-200 max-h-96 overflow-y-auto">
+        <p class="p-4 text-gray-500 text-center">No patients have been sent for lab tests today.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="section-lab-test-form" class="max-w-3xl mx-auto mt-10 bg-white p-8 rounded-xl shadow-lg hidden">
+    <h2 class="text-2xl font-semibold mb-6 text-gray-700">Lab Test for: <span id="test-patient-name" class="text-blue-700"></span></h2>
+    <div class="bg-blue-50 p-4 rounded-md mb-6 border border-blue-200">
+      <h3 class="text-lg font-semibold text-blue-800 mb-2">Patient Details</h3>
+      <p><strong>File No:</strong> <span id="test-file-number"></span></p>
+      <p><strong>Test Type:</strong> <span id="test-type"></span></p>
+      <p class="mt-2"><strong>Doctor's Diagnosis:</strong> <span id="test-doctors-diagnosis">N/A</span></p>
+    </div>
+
+    <form id="form-lab-results" class="space-y-6">
+      <div>
+        <label for="lab-results" class="block mb-2 text-gray-600 font-medium">Test Results</label>
+        <textarea id="lab-results" required rows="8" class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" placeholder="Enter lab results here..."></textarea>
+      </div>
+
+      <div class="flex justify-between items-center">
+        <button type="button" id="btn-back-to-lab-list" class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition duration-300">
+          Back to List
+        </button>
+        <button type="submit" class="bg-[#2b6cb0] text-white px-6 py-2 rounded-lg hover:bg-[#2a4365] transition duration-300">
+          Submit Results
+        </button>
+      </div>
+    </form>
+    <div id="lab-success" class="text-green-600 mt-4 font-medium"></div>
+  </section>
+
+  <script>
+    // --- Section References ---
+    const sectionLabDashboard = document.getElementById("section-lab-dashboard");
+    const sectionLabTestForm = document.getElementById("section-lab-test-form");
+
+    // --- Elements on Dashboard ---
+    const labPatientListDiv = document.getElementById("lab-patient-list");
+    const navLabBtn = document.getElementById("nav-lab");
+
+    // --- Elements on Test Form ---
+    const testPatientNameSpan = document.getElementById("test-patient-name");
+    const testFileNumberSpan = document.getElementById("test-file-number");
+    const testTypeSpan = document.getElementById("test-type");
+    const testDoctorsDiagnosisSpan = document.getElementById("test-doctors-diagnosis");
+    const formLabResults = document.getElementById("form-lab-results");
+    const labResultsTextarea = document.getElementById("lab-results");
+    const labSuccessMsg = document.getElementById("lab-success");
+    const btnBackToLabList = document.getElementById("btn-back-to-lab-list");
+
+    // --- Simulated Patient Data for the Lab ---
+    const patientsAwaitingLab = [
+      {
+        id: 'P002',
+        type: 'full_register',
+        first_name: 'Fatima',
+        sur_name: 'Bello',
+        reg_no: 'REG/2025/002',
+        fileNumber: 'FUD/2025/002',
+        labRequests: [
+          {
+            date: '11/08/2025',
+            time: '11:25:00',
+            testType: 'CHEMICAL PATHOLOGY REQUEST',
+            diagnosis: 'Mild Fever'
+          }
+        ]
+      },
+      {
+        id: 'P003',
+        type: 'simple_add',
+        fullName: 'John Doe',
+        fileNumber: 'FUD/2025/003',
+        labRequests: [
+          {
+            date: '11/08/2025',
+            time: '11:27:00',
+            testType: 'HAEMATOLOGY REQUEST',
+            diagnosis: 'Anemia'
+          }
+        ]
+      }
+    ];
+
+    let selectedPatientId = null; // To track the patient for the form
+
+    // --- Helper Functions ---
+    function hideAllSections() {
+      sectionLabDashboard.classList.add("hidden");
+      sectionLabTestForm.classList.add("hidden");
+    }
+
+    function showSection(sectionElement) {
+      hideAllSections();
+      sectionElement.classList.remove("hidden");
+    }
+
+    function setResultMessage(element, message, isSuccess) {
+      element.textContent = message;
+      element.classList.toggle("text-green-600", isSuccess);
+      element.classList.toggle("text-red-600", !isSuccess);
+    }
+
+    function renderLabPatientList() {
+      labPatientListDiv.innerHTML = "";
+      if (patientsAwaitingLab.length === 0) {
+        labPatientListDiv.innerHTML = "<p class='p-4 text-gray-500 text-center'>No patients have been sent for lab tests today.</p>";
+        return;
+      }
+      
+      patientsAwaitingLab.forEach(patient => {
+        const patientName = patient.type === 'simple_add' ? patient.fullName : `${patient.first_name} ${patient.sur_name}`;
+        const identifier = patient.type === 'simple_add' ? `File No: ${patient.fileNumber}` : `Reg. No: ${patient.reg_no}`;
+        const lastLabRequest = patient.labRequests[patient.labRequests.length - 1];
+
+        const patientItem = document.createElement("div");
+        patientItem.classList.add("patient-item");
+        patientItem.dataset.patientId = patient.id; // Add data attribute for lookup
+        patientItem.innerHTML = `
+          <h3 class="text-lg font-semibold text-gray-800">${patientName}</h3>
+          <p class="text-sm text-gray-600">${identifier} - Test Requested: <span class="font-medium">${lastLabRequest.testType}</span></p>
+          <p class="text-xs text-gray-500">Sent at: ${lastLabRequest.date} ${lastLabRequest.time}</p>
+        `;
+        labPatientListDiv.appendChild(patientItem);
+      });
+    }
+
+    function displayLabTestForm(patient) {
+      selectedPatientId = patient.id;
+      const lastLabRequest = patient.labRequests[patient.labRequests.length - 1];
+
+      const patientName = patient.type === 'simple_add' ? patient.fullName : `${patient.first_name} ${patient.sur_name}`;
+      testPatientNameSpan.textContent = patientName;
+      testFileNumberSpan.textContent = patient.fileNumber || 'N/A';
+      testTypeSpan.textContent = lastLabRequest.testType;
+      testDoctorsDiagnosisSpan.textContent = lastLabRequest.diagnosis || 'N/A';
+
+      labResultsTextarea.value = ''; // Clear previous results
+      setResultMessage(labSuccessMsg, "", true); // Clear previous messages
+      showSection(sectionLabTestForm);
+    }
+
+    // --- Event Listeners ---
+    navLabBtn.addEventListener('click', () => {
+      renderLabPatientList();
+      showSection(sectionLabDashboard);
+      document.querySelectorAll('.patient-item').forEach(item => item.classList.remove('selected'));
+    });
+
+    labPatientListDiv.addEventListener('click', (e) => {
+      const patientItem = e.target.closest('.patient-item');
+      if (patientItem) {
+        document.querySelectorAll('.patient-item').forEach(item => item.classList.remove('selected'));
+        patientItem.classList.add('selected');
+
+        const patientId = patientItem.dataset.patientId;
+        const patient = patientsAwaitingLab.find(p => p.id === patientId);
+        if (patient) {
+          displayLabTestForm(patient);
+        }
+      }
+    });
+
+    formLabResults.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const labResults = labResultsTextarea.value.trim();
+
+      if (!labResults) {
+        setResultMessage(labSuccessMsg, "Please enter the test results.", false);
+        return;
+      }
+
+      const patient = patientsAwaitingLab.find(p => p.id === selectedPatientId);
+      if (patient) {
+        const lastLabRequest = patient.labRequests[patient.labRequests.length - 1];
+        lastLabRequest.results = labResults; // Store results with the request
+        setResultMessage(labSuccessMsg, `Results for ${patient.fullName || patient.first_name + ' ' + patient.sur_name} submitted successfully!`, true);
+        
+        // In a real app, you would send this to a backend.
+        console.log(`Submitted lab results for ${patient.id}:`, lastLabRequest);
+
+        // Remove patient from the queue after submitting results
+        const patientIndex = patientsAwaitingLab.findIndex(p => p.id === selectedPatientId);
+        if (patientIndex > -1) {
+          patientsAwaitingLab.splice(patientIndex, 1);
+        }
+
+        setTimeout(() => {
+          renderLabPatientList();
+          showSection(sectionLabDashboard);
+          selectedPatientId = null;
+        }, 1500);
+      }
+    });
+
+    btnBackToLabList.addEventListener('click', () => {
+      showSection(sectionLabDashboard);
+      selectedPatientId = null;
+      document.querySelectorAll('.patient-item').forEach(item => item.classList.remove('selected'));
+    });
+
+    // --- Initial Load ---
+    document.addEventListener("DOMContentLoaded", () => {
+      renderLabPatientList();
+      showSection(sectionLabDashboard);
+    });
+  </script>
+
+</body>
+</html>

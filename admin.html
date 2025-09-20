@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FUD Clinic Admin Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#f4f8fb] font-sans min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="bg-[#2a4365] text-white p-6 flex flex-col items-center justify-center shadow space-y-2">
+    <img src="logo.jfif"
+         alt="FUD Logo"
+         class="h-16 w-16 rounded-full border border-white">
+    <h1 class="text-2xl font-bold text-center">FEDERAL UNIVERSITY DUTSE</h1>
+    <p class="text-lg text-center">Admin Dashboard</p>
+  </header>
+
+  <!-- Dashboard Layout -->
+  <div class="flex flex-1">
+    
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white shadow-md p-6">
+      <nav class="space-y-4">
+        <a href="#" class="block bg-[#2b6cb0] text-white px-4 py-2 rounded hover:bg-[#2a4365]">Doctor Panel</a>
+        <a href="#" class="block bg-[#2b6cb0] text-white px-4 py-2 rounded hover:bg-[#2a4365]">Laboratory</a>
+        <a href="#" class="block bg-[#2b6cb0] text-white px-4 py-2 rounded hover:bg-[#2a4365]">Pharmacy</a>
+        <a href="#" class="block bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Logout</a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-8">
+      <h2 class="text-2xl font-semibold text-gray-700 mb-6">Welcome, Admin!</h2>
+
+      <div class="bg-white p-6 rounded-lg shadow-md">
+        <p class="text-gray-600">Welcome to Admin Dashboard!</p>
+      </div>
+    </main>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FUD Clinic Records Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#f4f8fb] font-sans">
+
+  <header class="bg-[#2a4365] text-white px-6 py-6 shadow flex flex-col items-center justify-center space-y-2">
+    <img src="logo.jfif" alt="FUD Logo" class="h-16 w-16 rounded-full border border-white" onerror="this.onerror=null;this.src='https://placehold.co/64x64/2a4365/ffffff?text=FUD';" />
+    <div class="text-center">
+      <h1 class="text-2xl font-bold">FEDERAL UNIVERSITY DUTSE</h1>
+      <p class="text-lg">RECORD UNIT</p>
+    </div>
+    <nav class="mt-4">
+      <button id="header-btn-home" class="bg-[#2b6cb0] text-white px-6 py-2 rounded hover:bg-[#2a4365] focus:outline-none" data-target-section="section-clinic-dashboard">
+        Home
+      </button>
+    </nav>
+  </header>
+
+  <nav class="bg-gray-200 p-4 flex justify-center gap-4">
+    <button id="nav-btn-add-patient-simple" class="bg-[#2b6cb0] text-white px-6 py-2 rounded hover:bg-[#2a4365] focus:outline-none" data-target-section="section-add-new-patient">
+      Add New Patient
+    </button>
+  </nav>
+
+  <section id="section-clinic-dashboard" class="max-w-3xl mx-auto mt-8 bg-white p-8 rounded-lg shadow text-center">
+    <h2 class="text-3xl font-bold mb-8 text-gray-800">Clinic Records Dashboard</h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="bg-blue-100 p-6 rounded-lg shadow-md flex flex-col items-center justify-center">
+        <h3 class="text-xl font-semibold text-blue-800 mb-3">Register New Patient</h3>
+        <p class="text-gray-700 mb-4">Register new patient demographics and contact information (detailed form).</p>
+        <button id="dashboard-btn-register-patient-full" class="bg-[#2b6cb0] text-white px-8 py-3 rounded-lg hover:bg-[#2a4365] text-lg font-medium w-full" data-target-section="section-full-register">
+          Full Registration
+        </button>
+      </div>
+
+      <div class="bg-green-100 p-6 rounded-lg shadow-md flex flex-col items-center justify-center">
+        <h3 class="text-xl font-semibold text-green-800 mb-3">View Patient Records</h3>
+        <p class="text-gray-700 mb-4">Browse and search existing patient records ("Open Folder").</p>
+        <button id="dashboard-btn-view-patients" class="bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 text-lg font-medium w-full" data-target-section="section-view">
+          View Records
+        </button>
+      </div>
+
+      <div class="bg-purple-100 p-6 rounded-lg shadow-md flex flex-col items-center justify-center">
+        <h3 class="text-xl font-semibold text-purple-800 mb-3">Add New Patient (Simplified)</h3>
+        <p class="text-gray-700 mb-4">Quickly add patient for visit and send info to doctor.</p>
+        <button id="dashboard-btn-add-patient-simple" class="bg-purple-600 text-white px-8 py-3 rounded-lg hover:bg-purple-700 text-lg font-medium w-full" data-target-section="section-add-new-patient">
+          Add & Send to Doctor
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <section id="section-add-new-patient" class="max-w-xl mx-auto mt-8 bg-white p-8 rounded-lg shadow hidden">
+    <h2 class="text-xl font-semibold mb-6 text-gray-700">Quick Patient Visit Form</h2>
+
+    <form id="form-add-new-patient" class="space-y-4">
+      <div>
+        <label class="block mb-1 text-gray-600">Full Name</label>
+        <input type="text" id="simple-full-name"  required class="w-full p-2 border border-gray-300 rounded" />
+      </div>
+
+      <div>
+        <label class="block mb-1 text-gray-600">Date of Birth</label>
+        <input type="date" id="simple-dob" required class="w-full p-2 border border-gray-300 rounded" />
+      </div>
+
+      <div>
+        <label class="block mb-1 text-gray-600">File Number</label>
+        <input type="text" id="simple-file-number" required class="w-full p-2 border border-gray-300 rounded" />
+      </div>
+
+      <div>
+        <label class="block mb-1 text-gray-600">Visit Status</label>
+        <select id="simple-visit-status" class="w-full p-2 border border-gray-300 rounded">
+          <option value="New">New</option>
+          <option value="Revisit">Revisit</option>
+        </select>
+      </div>
+
+      <button type="submit" class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">
+        Send to Doctor
+      </button>
+    </form>
+
+    <div id="simple-register-success" class="text-green-600 mt-4"></div>
+    <div class="mt-6 text-center">
+      <button class="bg-gray-500 text-white px-6 py-2 rounded hover:bg-gray-600" data-target-section="section-clinic-dashboard">
+        Back to Dashboard
+      </button>
+    </div>
+  </section>
+
+
+  <section id="section-full-register" class="max-w-xl mx-auto mt-8 bg-white p-8 rounded-lg shadow hidden">
+    <h2 class="text-xl font-semibold mb-6 text-gray-700">Detailed Patient Registration</h2>
+
+    <form id="form-full-register" class="space-y-4">
+      <div>
+        <label class="block mb-1 text-gray-600">Reg. No</label>
+        <input type="text" id="full-reg-no" required class="w-full p-2 border border-gray-300 rounded" />
+      </div>
+
+      <div>
+        <label class="block mb-1 text-gray-600">First Name</label>
+        <input type="text" id="full-first-name" required class="w-full p-2 border border-gray-300 rounded" />
+      </div>
+
+      <div>
+        <label class="block mb-1 text-gray-600">Surname</label>
+        <input type="text" id="full-sur-name" required class="w-full p-2 border border-gray-300 rounded" />
+      </div>
+
+      <div>
+        <label class="block mb-1 text-gray-600">Date of Birth</label>
+        <input type="date" id="full-dob" required class="w-full p-2 border border-gray-300 rounded" />
+      </div>
+
+      <div>
+        <label class="block mb-1 text-gray-600">Department</label>
+        <input type="text" id="full-department" class="w-full p-2 border border-gray-300 rounded" />
+      </div>
+
+      <div>
+        <label class="block mb-1 text-gray-600">Contact Address</label>
+        <input type="text" id="full-contact-address" required class="w-full p-2 border border-gray-300 rounded" />
+      </div>
+
+      <div>
+        <label class="block mb-1 text-gray-600">Phone Number</label>
+        <input type="text" id="full-phone-number" required class="w-full p-2 border border-gray-300 rounded" />
+      </div>
+
+      <div>
+        <label class="block mb-1 text-gray-600">Next of Kin Name</label>
+        <input type="text" id="full-nok-name" class="w-full p-2 border border-gray-300 rounded" />
+      </div>
+
+      <div>
+        <label class="block mb-1 text-gray-600">Next of Kin Phone Number</label>
+        <input type="text" id="full-nok-phone" class="w-full p-2 border border-gray-300 rounded" />
+      </div>
+
+      <div>
+        <label class="block mb-1 text-gray-600">Next of Kin Address</label>
+        <input type="text" id="full-nok-address" class="w-full p-2 border border-gray-300 rounded" />
+      </div>
+
+      <div>
+        <label class="block mb-1 text-gray-600">Tribe</label>
+        <input type="text" id="full-tribe" class="w-full p-2 border border-gray-300 rounded" />
+      </div>
+
+      <div>
+        <label class="block mb-1 text-gray-600">Religion</label>
+        <input type="text" id="full-religion" class="w-full p-2 border border-gray-300 rounded" />
+      </div>
+
+      <div>
+        <label class="block mb-1 text-gray-600">Marital Status</label>
+        <select id="full-marital-status" class="w-full p-2 border border-gray-300 rounded">
+          <option value="">Select Status</option>
+          <option>Single</option>
+          <option>Married</option>
+          <option>Divorced</option>
+          <option>Widowed</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block mb-1 text-gray-600">Gender</label>
+        <select id="full-gender" class="w-full p-2 border border-gray-300 rounded">
+          <option>Male</option>
+          <option>Female</option>
+        </select>
+      </div>
+
+      <button type="submit" class="bg-[#2b6cb0] text-white px-4 py-2 rounded hover:bg-[#2a4365]">
+        Register Patient
+      </button>
+    </form>
+
+    <div id="full-register-success" class="text-green-600 mt-4"></div>
+    <div class="mt-6 text-center">
+      <button class="bg-gray-500 text-white px-6 py-2 rounded hover:bg-gray-600" data-target-section="section-clinic-dashboard">
+        Back to Dashboard
+      </button>
+    </div>
+  </section>
+
+
+  <section id="section-view" class="max-w-2xl mx-auto mt-8 bg-white p-8 rounded-lg shadow hidden">
+    <h2 class="text-xl font-semibold mb-4 text-gray-700">Registered Patients</h2>
+
+    <input type="text" id="search-bar" placeholder="Search by File Number, Reg. No, or Name" class="w-full mb-4 p-2 border border-gray-300 rounded" />
+
+    <div id="patient-list" class="bg-[#f7fafc] p-4 rounded space-y-2 max-h-96 overflow-y-auto">
+      </div>
+    <div class="mt-6 text-center">
+      <button class="bg-gray-500 text-white px-6 py-2 rounded hover:bg-gray-600" data-target-section="section-clinic-dashboard">
+        Back to Dashboard
+      </button>
+    </div>
+  </section>
+
+  <section id="section-send-to-doctor" class="max-w-xl mx-auto mt-8 bg-white p-8 rounded-lg shadow hidden">
+    <h2 class="text-xl font-semibold mb-6 text-gray-700">Send Existing Patient Info to Doctor</h2>
+
+    <div class="space-y-4">
+      <div>
+        <label class="block mb-1 text-gray-600">Patient File Number or Reg. No</label>
+        <input type="text" id="send-patient-identifier" required class="w-full p-2 border border-gray-300 rounded" placeholder="Enter patient file number or registration number" />
+      </div>
+      <button id="btn-send-info" class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">
+        Send Info to Doctor
+      </button>
+    </div>
+
+    <div id="send-info-message" class="text-green-600 mt-4"></div>
+
+    <div class="mt-6 text-center">
+      <button class="bg-gray-500 text-white px-6 py-2 rounded hover:bg-gray-600" data-target-section="section-clinic-dashboard">
+        Back to Dashboard
+      </button>
+    </div>
+  </section>
+
+  <script>
+    // --- Section References (using a map for cleaner access) ---
+    const sections = {
+      'section-clinic-dashboard': document.getElementById('section-clinic-dashboard'),
+      'section-add-new-patient': document.getElementById('section-add-new-patient'),
+      'section-full-register': document.getElementById('section-full-register'),
+      'section-view': document.getElementById('section-view'),
+      'section-send-to-doctor': document.getElementById('section-send-to-doctor'),
+    };
+
+    // --- Form and List Element References ---
+    const formAddNewPatient = document.getElementById("form-add-new-patient");
+    const simpleRegisterSuccessMessage = document.getElementById("simple-register-success");
+    const formFullRegister = document.getElementById("form-full-register");
+    const fullRegisterSuccessMessage = document.getElementById("full-register-success");
+    const patientList = document.getElementById("patient-list");
+    const searchBar = document.getElementById("search-bar");
+    const sendPatientIdentifierInput = document.getElementById("send-patient-identifier");
+    const btnSendInfo = document.getElementById("btn-send-info");
+    const sendInfoMessage = document.getElementById("send-info-message");
+
+    // In-memory patient data
+    const patients = [];
+
+    // --- Helper Functions ---
+    function hideAllSections() {
+      Object.values(sections).forEach(section => section.classList.add("hidden"));
+    }
+
+    function showSection(sectionId) {
+      hideAllSections();
+      sections[sectionId].classList.remove("hidden");
+      // Special handling for view section to re-render patient list
+      if (sectionId === 'section-view') {
+        renderPatients();
+      }
+    }
+
+    function setResultMessage(element, message, isSuccess) {
+      element.textContent = message;
+      element.classList.toggle("text-green-600", isSuccess);
+      element.classList.toggle("text-red-600", !isSuccess);
+    }
+
+    // --- Event Delegation for Navigation ---
+    document.addEventListener("click", (e) => {
+      const targetButton = e.target.closest('button[data-target-section]');
+      if (targetButton) {
+        const targetSectionId = targetButton.dataset.targetSection;
+        showSection(targetSectionId);
+      }
+    });
+
+    // --- Initial Load ---
+    document.addEventListener("DOMContentLoaded", () => {
+      showSection('section-clinic-dashboard');
+    });
+
+    // --- Form Submission Logic ---
+
+    // Simplified Add New Patient Form
+    formAddNewPatient.addEventListener("submit", function (e) {
+      e.preventDefault();
+      const fullName = document.getElementById("simple-full-name").value.trim();
+      const dob = document.getElementById("simple-dob").value;
+      const fileNumber = document.getElementById("simple-file-number").value.trim();
+      const visitStatus = document.getElementById("simple-visit-status").value;
+
+      if (!fullName || !dob || !fileNumber || !visitStatus) {
+        setResultMessage(simpleRegisterSuccessMessage, "Please fill in all required fields (Full Name, Date of Birth, File Number, Visit Status).", false);
+        return;
+      }
+
+      if (patients.some(p => p.fileNumber === fileNumber)) {
+        setResultMessage(simpleRegisterSuccessMessage, `Patient with File Number ${fileNumber} already exists.`, false);
+        return;
+      }
+
+      patients.push({ type: 'simple_add', fullName, dob, fileNumber, visitStatus });
+      formAddNewPatient.reset();
+      setResultMessage(simpleRegisterSuccessMessage, "Patient information sent to doctor successfully!", true);
+    });
+
+    // Detailed Patient Registration Form
+    formFullRegister.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const inputs = [
+        "full-reg-no", "full-first-name", "full-sur-name", "full-dob",
+        "full-contact-address", "full-phone-number", "full-gender"
+      ];
+      const formData = {};
+      let isValid = true;
+
+      inputs.forEach(id => {
+        const element = document.getElementById(id);
+        formData[id.replace('full-', '').replace('-', '_')] = element.value.trim();
+        if (element.hasAttribute('required') && !element.value.trim()) {
+          isValid = false;
+        }
+      });
+
+      // Handle optional fields
+      formData.department = document.getElementById("full-department").value.trim();
+      formData.nok_name = document.getElementById("full-nok-name").value.trim();
+      formData.nok_phone = document.getElementById("full-nok-phone").value.trim();
+      formData.nok_address = document.getElementById("full-nok-address").value.trim();
+      formData.tribe = document.getElementById("full-tribe").value.trim();
+      formData.religion = document.getElementById("full-religion").value.trim();
+      formData.marital_status = document.getElementById("full-marital-status").value;
+
+      if (!isValid) {
+        setResultMessage(fullRegisterSuccessMessage, "Please fill in all required fields for full registration.", false);
+        return;
+      }
+
+      if (patients.some(p => p.reg_no === formData.reg_no)) {
+        setResultMessage(fullRegisterSuccessMessage, `Patient with Reg. No ${formData.reg_no} already exists.`, false);
+        return;
+      }
+
+      patients.push({ type: 'full_register', ...formData });
+      formFullRegister.reset();
+      setResultMessage(fullRegisterSuccessMessage, "Patient fully registered successfully!", true);
+    });
+
+    // --- View Patients Logic ---
+    function renderPatients(filter = "") {
+      patientList.innerHTML = "";
+      const lowerCaseFilter = filter.toLowerCase();
+
+      const filtered = patients.filter(p => {
+        if (p.type === 'simple_add') {
+          return (p.fileNumber && p.fileNumber.toLowerCase().includes(lowerCaseFilter)) ||
+                 (p.fullName && p.fullName.toLowerCase().includes(lowerCaseFilter));
+        } else if (p.type === 'full_register') {
+          return (p.reg_no && p.reg_no.toLowerCase().includes(lowerCaseFilter)) ||
+                 (p.first_name && p.first_name.toLowerCase().includes(lowerCaseFilter)) ||
+                 (p.sur_name && p.sur_name.toLowerCase().includes(lowerCaseFilter));
+        }
+        return false;
+      });
+
+      if (filtered.length === 0) {
+        patientList.innerHTML = "<p class='text-gray-500'>No matching patients found or no patients registered yet.</p>";
+        return;
+      }
+
+      filtered.forEach((p) => {
+        const div = document.createElement("div");
+        div.className = "border-b border-gray-300 py-2 last:border-b-0";
+
+        let patientHtml = '';
+        if (p.type === 'simple_add') {
+          patientHtml = `
+            <strong>Type:</strong> Quick Add<br>
+            <strong>File No:</strong> ${p.fileNumber}<br>
+            <strong>Name:</strong> ${p.fullName}<br>
+            <strong>DOB:</strong> ${p.dob}<br>
+            <strong>Visit Status:</strong> ${p.visitStatus}
+          `;
+        } else if (p.type === 'full_register') {
+          patientHtml = `
+            <strong>Type:</strong> Full Register<br>
+            <strong>Reg No:</strong> ${p.reg_no}<br>
+            <strong>Name:</strong> ${p.first_name} ${p.sur_name}<br>
+            <strong>DOB:</strong> ${p.dob}<br>
+            <strong>Gender:</strong> ${p.gender}<br>
+            <strong>Contact:</strong> ${p.phone_number}<br>
+            <strong>Address:</strong> ${p.contact_address}<br>
+            <strong>Department:</strong> ${p.department || 'N/A'}<br>
+            <strong>Next of Kin:</strong> ${p.nok_name || 'N/A'} (Phone: ${p.nok_phone || 'N/A'})<br>
+            <strong>Tribe:</strong> ${p.tribe || 'N/A'}<br>
+            <strong>Religion:</strong> ${p.religion || 'N/A'}<br>
+            <strong>Marital Status:</strong> ${p.marital_status || 'N/A'}
+          `;
+        }
+        div.innerHTML = patientHtml;
+        patientList.appendChild(div);
+      });
+    }
+
+    searchBar.addEventListener("input", (e) => renderPatients(e.target.value.trim()));
+
+    // --- Send to Doctor Logic (from dedicated section) ---
+    btnSendInfo.addEventListener("click", () => {
+      const identifierToSend = sendPatientIdentifierInput.value.trim();
+      if (!identifierToSend) {
+        setResultMessage(sendInfoMessage, "Please enter a Patient File Number or Reg. No.", false);
+        return;
+      }
+
+      const patientFound = patients.find(p =>
+        (p.fileNumber && p.fileNumber === identifierToSend) ||
+        (p.reg_no && p.reg_no === identifierToSend)
+      );
+
+      if (patientFound) {
+        const name = patientFound.fullName || `${patientFound.first_name} ${patientFound.sur_name}`;
+        const identifierType = patientFound.fileNumber ? 'File No' : 'Reg. No';
+        setResultMessage(sendInfoMessage, `Information for patient ${name} (${identifierType}: ${identifierToSend}) successfully sent to doctor!`, true);
+        sendPatientIdentifierInput.value = "";
+      } else {
+        setResultMessage(sendInfoMessage, `Patient with identifier ${identifierToSend} not found.`, false);
+      }
+    });
+  </script>
+
+</body>
+</html>
